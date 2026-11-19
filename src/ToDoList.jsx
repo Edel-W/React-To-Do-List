@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 
 function ToDoList() {
 
-    const tasks = [
-        "Wash",
-        "Drive",
-        "Study",
-        "Cry"
-    ]
+    const [task, setTask ] = useState('')
+    const [taskList, setTaskList] = useState([])
 
+    function addNewTask () {
+        if (task.trim() === '') return;
+
+        setTaskList([...taskList, task]);
+        setTask('');   
+     }
 
   return (
     <>
@@ -16,31 +18,25 @@ function ToDoList() {
             <div className="input-group">
                 <input
                 type="text"
-                className="form-control" border-0 shadow-none bg-light
+                className="form-control  border-0 shadow-none bg-light rounded"
                 placeholder="Enter new task ..."
+                value= {task}
+                onChange={(e) => setTask(e.target.value)}
                 />
-                <button type="button" className="btn btn-primary" >
+                <button type="button" className="btn btn-primary" onClick={(e) => {addNewTask()}}>
                 Add task
                 </button>
             </div>
 
             <ul className="list-group mt-5 shadow-sm gap-1">
-                { tasks.map((task, index) => (
+                { taskList.map((task, index) => (
                     <li className="list-group-item d-flex gap-1">
                         <input className="form-check-input me-1" type="checkbox" value="" id="firstCheckbox"/>
                         {task}
-                        <button type="button" class="btn btn-outline-info ms-auto">Edit</button>
+                        <button type="button" className="btn btn-outline-info ms-auto">Edit</button>
                         <button type="button" className="btn btn-outline-danger ms-2">Delete</button>
                     </li>
                 ))}
-
- {/* {items.length === 0 && <p>No item found</p>}
-        <ul className="list-group">
-          { items.map((item, index) => (
-            <li className={ selectedIndex === index ? 'list-group-item active' : 'list-group-item'} 
-                key={index} onClick={() => setSelectedIndex(index) }>{item}</li>
-          ))}
-        </ul> */}
 
             </ul>
         </div>
