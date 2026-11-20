@@ -1,9 +1,29 @@
 import React, { useState } from 'react';
 
+function EditCard({ task, onSave, onCancel }) {
+    const [editedTask, setEditedTask] = useState(task);
+
+    return (
+        <div className="card-body d-flex gap-2">
+            <input type="text" className="form-control" 
+                    value={editedTask} contentEditable='true'
+                    onChange={(e) => {setEditedTask(e.target.value)}}/>
+
+            <button type="button" className="btn btn-primary" onClick={() => onSave(editedTask)}>
+                Save
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={onCancel}>
+                Cancel
+            </button>
+        </div>
+        )
+    }
+
 function ToDoList() {
 
     const [task, setTask ] = useState('')
     const [taskList, setTaskList] = useState([])
+    const [editingIndex, setEditingIndex] = useState(null)
 
     function addNewTask () {
         if (task.trim() === '') return;
@@ -18,13 +38,26 @@ function ToDoList() {
         );     
     }
 
-    function editTask (index) {
 
+    function editTask (index) {
+        setEditingIndex(index);    
     }
+
+    function saveEditedTask (index, updatedTask) {
+        setTaskList (
+            taskList.map((task, taskIndex) => 
+                taskIndex === index ? updatedTask : task
+            )
+        )
+
+        setEditingIndex(null)
+    }
+
 
   return (
     <>
         <div className="container mt-5">
+
             <div className="input-group">
                 <input
                 type="text"
@@ -40,17 +73,29 @@ function ToDoList() {
 
             <ul className="list-group mt-5 shadow-sm gap-1">
                 { taskList.map((task, index) => (
-                    <li className="list-group-item d-flex gap-1">
-                        <input className="form-check-input me-1" type="checkbox" value="" id="firstCheckbox" key={task.index}/>
-                        {task}
-                        <button type="button" className="btn btn-outline-info ms-auto"
-                            onClick={(e) => {editTask(index)}}>
-                            Edit
-                        </button>
-                        <button type="button" className="btn btn-outline-danger ms-2" 
-                            onClick={(e) => {deleteTask(index)}}>
-                            Delete
-                        </button>
+                    <li key={index} className="list-group-item d-flex gap-1">
+                        {editingIndex === index ? (
+                            <EditCard 
+                                task={task}
+                                onSave={(updatedTask) => 
+                                    saveEditedTask(index, updatedTask)
+                                }
+                                onCancel={() => setEditingIndex(null)}
+                            />
+                        ) : (
+                            <>
+                                <input className="form-check-input me-1" type="checkbox" value="" id="firstCheckbox" />
+                                {task}
+                                <button type="button" className="btn btn-outline-info ms-auto"
+                                    onClick={() => {editTask(index)}}>
+                                    Edit
+                                </button>
+                                <button type="button" className="btn btn-outline-danger ms-2" 
+                                    onClick={(e) => {deleteTask(index)}}>
+                                    Delete
+                                </button>
+                            </>
+                        )}
                     </li>
                 ))}
 
