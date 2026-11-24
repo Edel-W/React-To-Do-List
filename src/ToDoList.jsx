@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 
 function EditCard({ task, onSave, onCancel }) {
@@ -24,19 +25,20 @@ function ToDoList() {
     const [task, setTask ] = useState('')
     const [taskList, setTaskList] = useState([])
     const [editingIndex, setEditingIndex] = useState(null)
-    const [checkedTask, setCheckedTask] = useState(false)
 
     function addNewTask () {
         if (task.trim() === '') return;
 
-        setTaskList([...taskList, task]);
-        setTask('');   
+        setTaskList([
+            ...taskList, 
+            {text: task, completed: false}]);
+        setTask('');  
      }
 
     function deleteTask (index) {
         setTaskList(
             taskList.filter((task, taskIndex) => taskIndex !== index)
-        );     
+        );    
     }
 
 
@@ -47,13 +49,21 @@ function ToDoList() {
     function saveEditedTask (index, updatedTask) {
         setTaskList (
             taskList.map((task, taskIndex) => 
-                taskIndex === index ? updatedTask : task
+                taskIndex === index ? { ...task, text: updatedTask} : task
             )
         )
 
         setEditingIndex(null)
     }
 
+    function completedTask (index) {
+        setTaskList(
+            taskList.map((task, taskIndex) => 
+                taskIndex === index ? { ...task, completed: !task.completed}
+                : task
+            )
+        )
+    }
 
   return (
     <>
@@ -78,7 +88,7 @@ function ToDoList() {
                     <li key={index} className="list-group-item d-flex gap-1">
                         {editingIndex === index ? (
                             <EditCard 
-                                task={task}
+                                task={task.text}
                                 onSave={(updatedTask) => 
                                     saveEditedTask(index, updatedTask)
                                 }
@@ -86,9 +96,11 @@ function ToDoList() {
                             />
                         ) : (
                             <>
-                                <input className="form-check-input me-1" type="checkbox" value="" id="checkbox " onChange={(e) => setCheckedTask(e.target.checked)}/>
-                                { checkedTask ? <del>{task}</del> : task}
-                                
+                                <input className="form-check-input me-1" type="checkbox" id="checkbox "
+                                       checked={task.completed}
+                                       onChange={() => completedTask(index)}/>
+                                { task.completed ? <del>{task.text}</del> : task.text}
+
                                 <button type="button" className="btn btn-outline-info ms-auto"
                                     onClick={() => {editTask(index)}}>
                                     Edit
